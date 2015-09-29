@@ -13,7 +13,7 @@ If you would like to contibute masks, please do :-)
 * Add a feature to generate complimentary specular maps
 * Add a coloring tool to select quads on the default UV
 
-## To reasearch
+## To research
 
 * Baking textures in Javascript
 * Displaying the default MakeHuman mesh with WebGL for live viewing
