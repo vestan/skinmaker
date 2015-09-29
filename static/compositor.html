@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="Experimental skin generator to use with MakeHuman">
+    <meta name="author" content="anon">
+    <link rel="icon" href="static/favicon.ico">
+
+    <title>Experimental Skin Compositor for MakeHuman</title>
+    
+    <script>    
+    /*jshint latedef:false */
+    "use strict";
+
+    var 
+        compositorUI,
+        default_skins = [
+            {
+                "name": "Middleage african female",
+                "url": "/static/compositor/middleage_darkskinned_female_diffuse.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Middleage african male",
+                "url": "/static/compositor/middleage_darkskinned_male_diffuse.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Middleage caucasian female 2",
+                "url": "/static/compositor/middleage_lightskinned_female_diffuse2.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Middleage caucasian female",
+                "url": "/static/compositor/middleage_lightskinned_female_diffuse.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Middleage caucasian male 2",
+                "url": "/static/compositor/middleage_lightskinned_male_diffuse2.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Middleage caucasian male",
+                "url": "/static/compositor/middleage_lightskinned_male_diffuse.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Old african female",
+                "url": "/static/compositor/old_darkskinned_female_diffuse.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Old african male",
+                "url": "/static/compositor/old_darkskinned_male_diffuse.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Old caucasian female",
+                "url": "/static/compositor/old_lightskinned_female_diffuse.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Old caucasian female 2",
+                "url": "/static/compositor/old_lightskinned_female_diffuse2.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Old caucasian male",
+                "url": "/static/compositor/old_lightskinned_male_diffuse2.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Old caucasian male",
+                "url": "/static/compositor/old_lightskinned_male_diffuse.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Young african female",
+                "url": "/static/compositor/young_darkskinned_female_diffuse.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Young african male",
+                "url": "/static/compositor/young_darkskinned_male_diffuse.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Young caucasian female 2",
+                "url": "/static/compositor/young_lightskinned_female_diffuse2.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Young caucasian female 3",
+                "url": "/static/compositor/young_lightskinned_female_diffuse3.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Young caucasian female (diffuse)",
+                "url": "/static/compositor/young_lightskinned_female_diffuse.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Young caucasian male (diffuse)",
+                "url": "/static/compositor/young_lightskinned_male_diffuse3.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            },
+            {
+                "name": "Young caucasian male",
+                "url": "/static/compositor/young_lightskinned_male_diffuse.png",
+                "credit": "Manuel Bastioni / MakeHuman",
+                "attrib": "http://www.makehuman.org/"
+            }
+        ],
+        default_masks = [
+            {
+                "name": "Isotherm tattoo",
+                "url": "/static/compositor/mask_isotherms.png",
+                "credit": "Nordisk familjebok / Wikimedia",
+                "attrib": "https://commons.wikimedia.org/wiki/File:Isotherms_ugglan.jpg"
+            },
+            {
+                "name": "Leopard print tattoo",
+                "url": "/static/compositor/mask_leopard_skin.png",
+                "credit": "Kürschner / Wikimedia",
+                "attrib": "https://commons.wikimedia.org/wiki/File:Leopard_fur-skin_1.JPG"
+            },
+            {
+                "name": "Lips",
+                "url": "/static/compositor/mask_lips.png",
+                "credit": "self / GFDL",
+                "attrib": ""
+            },
+            {
+                "name": "Eyeliner (rough)",
+                "url": "/static/compositor/mask_eyeliner.png",
+                "credit": "self / GFDL",
+                "attrib": ""
+            }
+        ];
+    
+    function setupPage() {
+        compositorUI = createCompositor($('#cnvComposite')[0], default_skins, default_masks);
+    }
+    
+    /**
+     *  Utility to make random IDs
+     *  credit: http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+     */
+    
+    function guid() {
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+        }
+        return s4() + s4() + 'x' + s4() + 'x' + s4() + 'x' +
+        s4() + 'x' + s4() + s4() + s4();
+    }
+    
+    /**
+     *  Object to collect a set of layers and combine them into a canvas
+     */
+    
+    function createCompositor(cnv, skins, masks) {
+        var 
+            self = {
+            
+                //  properties
+                'canvas': cnv,
+                'skins': skins,
+                'masks': masks,
+                
+                'skinLayers': [],
+                'maskLayers': [],
+
+                'autoredraw': false,
+
+                //  event handers
+                'onLayerChange': onLayerChange,
+
+                //  public methods
+                'clearCanvas': clearCanvas,
+                'redraw': redraw,
+                'setSkinLayerTransparency': setSkinLayerTransparency,
+                'removeLayer': removeLayer
+            };
+            
+        function init() {
+            addSelectBoxImages(self.skins, 'selSkins');
+            addSelectBoxImages(self.masks, 'selMasks');
+            $('#btnAddSkin').on('click', onAddSkinClick);
+            $('#btnAddMask').on('click', onAddMaskClick);
+            self.clearCanvas();
+
+            $('#aDownload' ).on('click', function downloadCanvas() {
+                this.href = self.canvas.toDataURL('image/png');
+                this.download = "skin_texture.png";
+            });
+
+            $('#btnRedraw' ).on('click', function() {
+                self.redraw();
+            });
+
+            $('#fileUploadMask' ).on('change', onUploadMask)
+
+            //$('#chkAutoUpdate' ).prop('checked', true);
+        }
+
+        function addSelectBoxImages(images, selectId) {
+            var opts = '', i;
+            for (i = 0; i < images.length; i++) {
+                opts = opts + '<option value="' + i + '">' + images[i].name + '</option>';
+            }            
+            $('#' + selectId).html(opts);            
+        }
+        
+        function clearCanvas() {
+            var ctx = self.canvas.getContext('2d');
+            ctx.fillStyle = '#B87333';
+            ctx.fillRect(0, 0, cnv.width, cnv.height);
+        }
+       
+        function removeLayer(layerId, isMask) {
+            var 
+                oldLayerSet = isMask ? self.maskLayers : self.skinLayers,
+                newLayerSet = [], 
+                i;
+            
+            for (i = 0; i < oldLayerSet.length; i++) {
+                if (oldLayerSet[i].id !== layerId) {
+                    console.log('keeping: ' + oldLayerSet[i].name);
+                    newLayerSet.push(oldLayerSet[i]);
+                } else {
+                    console.log('removing: ' + oldLayerSet[i].name);
+                }
+            }
+            
+            if (isMask) {
+                self.maskLayers = newLayerSet;
+            } else {
+                self.skinLayers = newLayerSet;
+            }
+            
+            self.onLayerChange();
+        }
+       
+        /**
+         *  When a skin layer slider is changed, update the other so that they total 100
+         *
+         *  @param  layer       {object}    Layer which was updated
+         *  @param  holdValue   {number}    New transparency slider value
+         */
+        
+        function setSkinLayerTransparency(layer, holdValue) {
+        
+            //  if there is only one skin layer then there is nothing to mix
+            if (1 === self.skinLayers.length) {
+                self.skinLayers[0].sliderTransparent.value = 100;
+                self.skinLayers[0].sliderTransparent.redraw();
+                return;
+            }
+            
+            if (!layer) { return; }
+
+            var 
+                free = (100 - holdValue),
+                total = 0, 
+                tempProportion,
+                i;
+
+            for (i = 0; i < self.skinLayers.length; i++) {
+                if (self.skinLayers[i].id !== layer.id) {
+                    total = total + self.skinLayers[i].sliderTransparent.value;
+                }                
+            }
+
+            for (i = 0; i < self.skinLayers.length; i++) {
+                if (self.skinLayers[i].id !== layer.id) {
+                    tempProportion = self.skinLayers[i].sliderTransparent.value / total;
+                    self.skinLayers[i].sliderTransparent.value = tempProportion * free;
+                    self.skinLayers[i].sliderTransparent.redraw();
+                }                
+            }
+            
+            console.log('update sliders');
+            self.onLayerChange();
+        }     
+
+        function onLayerChange() {
+            self.autoredraw = $('#chkAutoUpdate' ).is(':checked');
+            if (self.autoredraw) {
+                redraw();
+            }
+        }
+
+        function redraw() {
+            var 
+                tempCanvas = document.createElement('canvas'), 
+                tempCtx,
+                drawCtx,
+                skinCtx,
+                skinBuffers = [],
+                maskBuffers = [],
+                alphas = [],
+                drawBuffer,
+                slider,
+                chVal, maskVal, maskInverse,
+                 
+                r, g, b,            //  sampled channel values from draing buffer
+                rR, gR, bR,         //  adjusted dynamic range
+                rA, gA, bA,         //  adjusted level within range
+                
+                i, j;
+        
+            if (0 === self.skinLayers.length) {
+                self.clearCanvas();
+                return;
+            }
+        
+            tempCanvas.width = 2048;    //  current size of MH skins
+            tempCanvas.height = 2048;    //  current size of MH skins
+            tempCtx = tempCanvas.getContext('2d');
+            drawBuffer = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+        
+            //  get direct access to skin pixels for all layers, note transparency of all layers
+        
+            for (i = 0; i < self.skinLayers.length; i++) {
+                skinCtx = self.skinLayers[i].canvas.getContext('2d');
+                skinBuffers[i] = skinCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+                alphas[i] = (self.skinLayers[i].sliderTransparent.value / 100);
+            }
+            
+            //  mix skin pixels
+        
+            for (i = 0; i < drawBuffer.data.length; i++) {
+                chVal = 0;
+                for (j = 0; j < self.skinLayers.length; j++) {
+                    chVal = chVal + (skinBuffers[j].data[i] * alphas[j]);
+                }
+                chVal = Math.floor(chVal);
+                if (chVal > 255) { chVal = 255; }
+                drawBuffer.data[i] = chVal;                
+            }
+            
+            //  get direct access to mask pixels for all layers, note transparency of all layers
+        
+            for (i = 0; i < self.maskLayers.length; i++) {
+                skinCtx = self.maskLayers[i].canvas.getContext('2d');
+                maskBuffers[i] = skinCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+                alphas[i] = (self.maskLayers[i].sliderTransparent.value / 100);
+                console.log('mask layers: ' + 1);
+            }
+        
+            //  add mask pixels
+        
+            for (i = 0; i < drawBuffer.data.length; i += 4) {
+                                
+                for (j = 0; j < self.maskLayers.length; j++) {
+        
+                    //  read RGB values        
+                    r = drawBuffer.data[i + 0];
+                    g = drawBuffer.data[i + 1];
+                    b = drawBuffer.data[i + 2];
+                    
+                    //  apply white / black point and level adjustments, red channel (crude)
+                    slider = self.maskLayers[j].levelEditor.rSlider;
+                    
+                    if (r >= slider.value) {
+                        //  above mid point
+                        if (r > slider.high) {
+                            rA = 255;   //  above white point, blown out
+                        } else {
+                            rR = (r - slider.value) / (slider.high - slider.value);  
+                            rA = (rR * 128) + 128;                        
+                        }
+                    } else {
+                        //  below mid point
+                        if (r < slider.low) {
+                            rA = 0;
+                        } else {
+                            rR = (r - slider.low) / (slider.value - slider.low);  
+                            rA = (rR * 128);                        
+                        }
+                    }
+                                        
+                    //  apply white / black point and level adjustments, green channel (crude)
+                    slider = self.maskLayers[j].levelEditor.gSlider;
+                   
+                    if (g >= slider.value) {
+                        //  above mid point
+                        if (g > slider.high) {
+                            gA = 255;   //  above white point, blown out
+                        } else {
+                            gR = (g - slider.value) / (slider.high - slider.value);  
+                            gA = (gR * 128) + 128;                        
+                        }
+                    } else {
+                        //  below mid point
+                        if (g < slider.low) {
+                            gA = 0;
+                        } else {
+                            gR = (g - slider.low) / (slider.value - slider.low);  
+                            gA = (gR * 128);                        
+                        }
+                    }
+                    
+                    //  apply white / black point and level adjustments, blue channel (crude)
+                    slider = self.maskLayers[j].levelEditor.bSlider;
+                    
+                    if (b >= slider.value) {
+                        //  above mid point
+                        if (b > slider.high) {
+                            bA = 255;   //  above white point, blown out
+                        } else {
+                            bR = (b - slider.value) / (slider.high - slider.value);  
+                            bA = (bR * 128) + 128;                        
+                        }
+                    } else {
+                        //  below mid point
+                        if (b < slider.low) {
+                            bA = 0;
+                        } else {
+                            bR = (b - slider.low) / (slider.value - slider.low);  
+                            bA = (bR * 128);                        
+                        }
+                    }                    
+                    
+                    //  mix with drawbuffer according to mask color and slider transparency
+                    
+                    maskVal = ((maskBuffers[j].data[i] / 255) * (self.maskLayers[j].sliderTransparent.value / 100));
+                    maskInverse = 1 - maskVal;
+                    
+                    r = Math.floor((r * maskInverse) + (rA * maskVal));
+                    g = Math.floor((g * maskInverse) + (gA * maskVal));
+                    b = Math.floor((b * maskInverse) + (bA * maskVal));
+                    
+                    if (r > 255) { r = 255; }
+                    if (r < 0) { r = 0; }
+                    if (g > 255) { g = 255; }
+                    if (g < 0) { g = 0; }
+                    if (b > 255) { b = 255; }
+                    if (b < 0) { b = 0; }
+                    
+                    drawBuffer.data[i + 0] = r;
+                    drawBuffer.data[i + 1] = g;
+                    drawBuffer.data[i + 2] = b;                    
+                }
+            }
+        
+            //  display result
+        
+            drawCtx = self.canvas.getContext('2d');
+            drawCtx.putImageData(drawBuffer, 0, 0);
+        }
+       
+        //  EVENT HANDLERS
+
+        function onAddSkinClick() {
+            var 
+                imageIdx = parseInt($('#selSkins').val(), 10),
+                image = self.skins[imageIdx] ? self.skins[imageIdx] : null,
+                newSkin, 
+                i;
+            
+            if (!image) { return; }
+            
+            //  disallow duplicates
+            for (i = 0; i < self.skinLayers.length; i++) {
+                if (self.skinLayers[i].url === image.url) {
+                    return;
+                }
+            }
+
+            newSkin = createLayer(self, image, false);                
+            self.skinLayers.push(newSkin);
+            if (1 === self.skinLayers.length) {
+                newSkin.sliderTransparent.value = 100;
+                newSkin.sliderTransparent.redraw();
+            }
+        }
+        
+        function onAddMaskClick() {
+            var 
+                imageIdx = parseInt($('#selMasks').val(), 10),
+                image = self.masks[imageIdx] ? self.masks[imageIdx] : null,
+                newMask = createLayer(self, image, true ),
+                i;
+
+            //  disallow duplicates
+            for (i = 0; i < self.maskLayers.length; i++) {
+                if (self.maskLayers[i].url === image.url) {
+                    return;
+                }
+            }
+            newMask.sliderTransparent.value = 50;
+            newMask.sliderTransparent.redraw();
+            self.maskLayers.push(newMask);
+        }          
+
+        function onUploadMask(evt) {
+
+            if (!evt || !evt.target || !evt.target.files || !evt.target.files[0]) {
+                return;
+            }
+
+            var
+                file = evt.target.files[0],
+                img = new Image();
+
+            img.onload = function() {
+                console.log('inage uploaded from disk');
+                var
+                    layerImg = {
+                        'name': file.name,
+                        'url': '',
+                        'imgLit': img,
+                        'credit': 'uploaded',
+                        'attrib': ''
+                    },
+                    newMask = createLayer(self, layerImg, true );
+
+                newMask.sliderTransparent.value = 50;
+                newMask.sliderTransparent.redraw();
+                self.maskLayers.push(newMask);
+            };
+
+            img.src = URL.createObjectURL(file);
+        }
+
+        //  set up and expose API
+        
+        init();
+        return self;
+    }
+    
+    /**
+     *  Object holding a single layer and its controls
+     */
+    
+    function createLayer(compositor, image, isMask) {
+        var 
+            self = {
+                'compositor': compositor,
+                'id': '',
+                'parentId': (isMask ? 'divMasks': 'divSkins'),
+                'url': image.url,
+                'name': image.name,
+                'imgLit': image.imgLit ? image.imgLit : null,
+                'credit': image.credit,
+                'attrib': image.attrib,
+                'isMask': isMask,
+                'canvas': null,
+                'color': '#000000',
+                'loading': true,
+                
+                'sliderTransparent': null,
+                'levelEditor': null
+            };
+            
+        function init() {
+            self.id = 'div' + guid();
+            self.canvas = document.createElement('canvas');
+            addToPage();
+        }        
+        
+        function addToPage() {
+            var jqSelf, ctx;
+            
+            $('#' + self.parentId).append(
+                '<div id="' + self.id + '" class="panel panel-warning">' +
+                  '<div class="panel-heading">' + 
+                    self.name +
+                    '<button id="btnClose' + self.id + '" class="btn btn-xs btn-default" style="float: right;">' +
+                      '<i class="glyphicon glyphicon-remove"></i>' +
+                    '</button>' +
+                    '<button id="btnShow' + self.id + '" class="btn btn-xs btn-default" style="float: right;">' +
+                      '<i class="glyphicon glyphicon-picture"></i>' +
+                    '</button>' +
+                  '</div>' +
+                  '<div class="panel-body" id="pb' + self.id + '"></div>' +                   
+                '</div>'
+            );            
+                      
+            jqSelf = $('#pb' + self.id);
+
+            if (self.isMask) {
+                jqSelf.append('<div><small>Alpha / transparency:</small></div>');
+            }
+            
+            self.sliderTransparent = createSlider('pb' + self.id, 0, 100, onTransparencyChange);                       
+            
+            if (self.isMask) {
+                jqSelf.append('<div><small>RGB levels:</small></div>');
+                self.levelEditor = createLevelEditor('pb' + self.id, onLevelChange)
+            }
+            
+            $('#btnClose' + self.id).on('click', onRemoveLayer);
+            $('#btnShow' + self.id).on('click', onDisplayLayer);
+
+            if ('' !== self.credit) {
+                if ('' !== self.attrib) {
+                    jqSelf.append('<div><small style="float: right;"><a href="' + self.attrib + '">' + self.credit + '</a></small></div>');
+                } else {
+                    jqSelf.append('<div><small style="float: right;">' + self.credit + '</small></div>');
+                }
+            }
+
+
+            if ('' !== self.url) {
+                loadImage();
+            } else {
+                self.canvas.width = 2048;
+                self.canvas.height = 2048;
+
+                ctx = self.canvas.getContext('2d');
+                ctx.drawImage(self.imgLit, 0, 0, 2048, 2048);
+
+                $('#' + self.id).removeClass('panel-warning').addClass('panel-default');
+                self.loading = false;
+                self.compositor.onLayerChange();
+            }
+
+        }
+        
+        function loadImage() {
+            var img = new Image();
+            
+            img.onload = function() {
+                var ctx;
+                
+                console.log('img loaded: ' + self.url);                
+                self.canvas.width = img.width;
+                self.canvas.height = img.height;              
+                
+                ctx = self.canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                                  
+                $('#' + self.id).removeClass('panel-warning').addClass('panel-default');
+                self.loading = false;
+                self.compositor.onLayerChange();
+            };
+            
+            img.src = self.url;
+        }
+        
+        function onTransparencyChange(sliderValue) {        
+            if (true === self.loading) { return; }
+        
+            if (!self.isMask) {
+                self.compositor.setSkinLayerTransparency(self, sliderValue);
+            } else {
+                console.log('alpha: ' + sliderValue);            
+                self.compositor.onLayerChange();
+            }
+        }
+    
+        function onLevelChange() {
+            console.log('Level change: ' + self.name);
+            self.compositor.onLayerChange();
+        }
+        
+        function onRemoveLayer() {
+            //  adjust any other sliders to take the lost proportion
+            self.compositor.setSkinLayerTransparency(self, 0);
+            //  unlink from compositor
+            self.compositor.removeLayer(self.id, self.isMask);
+            //  remove from DOM
+            $('#' + self.id).remove();
+        }
+
+        function onDisplayLayer() {
+            var ctx = self.compositor.canvas.getContext('2d');
+            ctx.drawImage(self.canvas, 0, 0);
+        }
+
+        init();
+    
+        return self;
+    }
+    
+    /**
+     *  Simple canvas slider
+     */
+    
+    function createSlider(parentId, minVal, maxVal, onChange) {
+        var 
+            self = {
+                'id': '',
+                'parentId': parentId,
+                'canvas': null,
+                'value': 0,
+                'low': minVal,
+                'high': maxVal,
+                'minVal': minVal,
+                'maxVal': maxVal,
+                'width': 512,
+                'height': 15,
+                'bgColor': '#eeeeee',
+                'fgColor': '#999999',
+                'isRange': false,
+                
+                'onChange': onChange,
+                
+                'redraw': redraw
+            };
+            
+        function init() {
+            var jqCanvas;
+            self.id = 'sl' + guid();
+            $('#' + self.parentId).append('<canvas id="' + self.id + '"></canvas><br/>');
+
+            jqCanvas = $('#' + self.id);
+
+            self.canvas = jqCanvas[0];
+            self.canvas.width = self.width;
+            self.canvas.height = self.height;
+            self.redraw();
+
+            //jqCanvas.on('click', onProgressClick);
+
+            jqCanvas.on('mousedown', function(evt) {
+                //  don't spam redraws on mouse move
+                self.mousedown = (false === $('#chkAutoUpdate' ).is(':checked'));
+                onProgressClick(evt);
+            });
+            jqCanvas.on('mousemove', function(evt) { if (true === self.mousedown) { onProgressClick(evt); }});
+            jqCanvas.on('mouseup', function(evt) { self.mousedown = false; });
+            jqCanvas.on('mouseout', function(evt) { self.mousedown = false; });
+
+        }
+    
+        function redraw() {
+            var 
+                range = (self.maxVal - self.minVal),
+                lowPx = (self.width * (self.low / range)),
+                highPx = (self.width * (self.high / range)),
+                valuePx = (self.width * (self.value / range)),
+                ctx = self.canvas.getContext('2d');               
+                
+            ctx.fillStyle = self.bgColor;
+            ctx.fillRect(0, 0, self.width, self.height);
+            
+            if (false === self.isRange) {
+                ctx.fillStyle = self.fgColor;
+                ctx.fillRect(0, 0, valuePx, self.height);
+            } else {
+                ctx.fillStyle = self.fgColor;
+                ctx.fillRect(lowPx, 0, (highPx - lowPx), self.height);
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(lowPx - 1, 0, 2, self.height);
+                ctx.fillRect(valuePx - 1, 0, 2, self.height);
+                ctx.fillRect(highPx - 1, 0, 2, self.height);
+            }
+        }
+        
+        function onProgressClick(evt) {
+            var 
+                clickLeftPx = evt.offsetX,
+                clickLeftVal = (clickLeftPx / self.width) * (self.maxVal - self.minVal),
+                dx,
+                closestVal,
+                closestTo = 'value';
+        
+        
+            if (false === self.isRange) {
+                self.value = clickLeftVal;
+                //console.log('slider value:' + self.value);
+            } else {                
+                dx = {                
+                    'low': Math.abs(self.low - clickLeftVal),
+                    'value': Math.abs(self.value - clickLeftVal),
+                    'high': Math.abs(self.high - clickLeftVal)
+                };
+                
+                console.log('low: ' + self.low + ' val: ' + self.value + ' high: ' + self.high);
+                console.log('dx', dx);
+                
+                closestVal = self.maxVal;
+                
+                if (dx.low < closestVal) { closestTo = 'low'; closestVal = dx.low; }
+                if (dx.value < closestVal) { closestTo = 'value'; closestVal = dx.value; }
+                if (dx.high < closestVal) { closestTo = 'high'; }
+                                
+                self[closestTo] = clickLeftVal;
+                console.log('slider click closest to ' + closestTo);
+            }
+    
+            redraw();
+            self.onChange(self.value);
+        }
+    
+        init();
+        return self;
+    }
+    
+    function createLevelEditor(parentId, onChange) {
+        var 
+            self = {
+                'id': '',
+                'parentId': parentId,                                
+                'width': 512,
+                'height': 15,                
+                
+                'rSlider': null,
+                'gSlider': null,
+                'bSlider': null,
+                
+                'onChange': onChange,                
+                'redraw': redraw
+            };
+            
+        function init() {
+            self.id = 'sl' + guid();
+            
+            self.rSlider = createSlider(self.parentId, 0, 255, self.onChange);
+            self.gSlider = createSlider(self.parentId, 0, 255, self.onChange);
+            self.bSlider = createSlider(self.parentId, 0, 255, self.onChange);
+            
+            self.rSlider.isRange = true;
+            self.gSlider.isRange = true;
+            self.bSlider.isRange = true;
+            
+            self.rSlider.fgColor = '#ff6666';
+            self.gSlider.fgColor = '#66ff66';
+            self.bSlider.fgColor = '#6666ff';
+            
+            self.rSlider.value = 128;
+            self.gSlider.value = 128;
+            self.bSlider.value = 128;
+            
+            self.redraw();
+        }
+    
+        function redraw() {
+            self.rSlider.redraw();
+            self.gSlider.redraw();
+            self.bSlider.redraw();
+        }
+            
+        init();
+        return self;
+    }
+    
+    </script>
+    
+  </head>
+
+  <body onload="setupPage();">
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Skin Compositor</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a id="aDownload" href="#">Download</a></li>
+            <li><a href="http://makehuman.org/">MakeHuman</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <br/>
+    
+    <br/><br/>
+    
+    <div id="divMain" class="container">
+    
+      <canvas id="cnvComposite" width="2048px" height="2048px" style="width: 1132px; height: 1132px;"></canvas><br/>
+
+      <table noborder>
+        <tr>
+          <td>
+            <button id="btnRedraw" class="btn btn-default" style="float: right;">Refresh</button>
+          </td>
+          <td width="10px">
+          </td>
+          <td>
+            <div class="checkbox">
+              <label><input type="checkbox" id="chkAutoUpdate"> Update on change</label>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <hr/>
+
+      <div class="row marketing">
+        <div class="col-lg-6">
+                
+          <h4>Textures (mix)</h4>
+          <div id="divAddSkins" class="form-group form-inline">
+            <select class="form-control" id="selSkins"></select>
+            <button class="btn btn-default" id="btnAddSkin">Add</button>
+          </div>
+          <div id="divSkins"></div>
+        </div>
+
+        <div class="col-lg-6">
+          <h4>Masks (add)</h4>
+          <div id="divAddMasks" class="form-group form-inline">
+            <select class="form-control" id="selMasks"></select>
+            <button class="btn btn-default" id="btnAddMask">Add</button>
+          </div>
+          <div id="divMasks"></div>
+          <div id="divUploadMask">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                Upload Mask
+              </div>
+              <div class="panel-body">
+                  <input type="file" id="fileUploadMask" class="form-control" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer">
+        <hr>
+        <h3>About</h3>
+        <p>This page is an experiment in making a web-based compositor for skin images for human figures.  It is
+        intended to work with the Materials Editor plugin of the <a href="http://www.makehuman.org">MakeHuman</a>
+        3D modelling software.  Its purpose is to help simplify basic customization of skins for human characters.</p>
+
+        <p>To apply a skin texture from this page to a model in MakeHuman:</p>
+
+        <ul>
+            <li>Download the skin image</li>
+            <li>Set a skin material on your model</li>
+            <li>Open the "Material Editor" task on the "Utilities" category</li>
+            <li>Set the shader to "litsphere"</li>
+            <li>Click the button under "Diffuse texture" and browser to your file.</li>
+        </ul>
+
+        <p>At present this is an early test and content is very limited, please submit your own masks or skins if you
+        are happy to share them. All images used by this page belong to their respective owners, licences can be found
+        at the linked pages.  I expect this page will work in all modern browsers, Safari and IE may have problems.</p>
+
+        <p>This companion software is not written or supported by the MakeHuman project, please
+        don't bug them about it.</p>
+      </footer>
+
+    </div>
+    <hr/>
+    <br/><br/>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <script src="/static/jquery.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+  </body>
+</html>
+
