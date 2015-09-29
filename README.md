@@ -2,6 +2,8 @@
 
 This is an experimental Javascript utility to comsposite skin layers for MakeHuman models.
 
+[Live demo is here](http://vestan.github.io/)
+
 All skin images are made by and belong to the MakeHuman project, all credit should go to them.  Bug reports, comments and complaints should be made here, and not with the MakeHuman project.
 
 If you would like to contibute masks, please do :-)
