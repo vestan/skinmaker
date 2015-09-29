@@ -151,20 +151,31 @@
                 "name": "Lips",
                 "url": "/static/compositor/mask_lips.png",
                 "credit": "self / GFDL",
-                "attrib": ""
+                "attrib": "https://github.com/vestan/skinmaker"
             },
             {
                 "name": "Eyeliner (rough)",
                 "url": "/static/compositor/mask_eyeliner.png",
                 "credit": "self / GFDL",
-                "attrib": ""
+                "attrib": "https://github.com/vestan/skinmaker"
             }
         ];
     
     function setupPage() {
         compositorUI = createCompositor($('#cnvComposite')[0], default_skins, default_masks);
+        $('#aAbout' ).on('click', function() { showModal('About', $('#divAbout' ).html()); });
     }
-    
+
+    /**
+     *  Utility to show a bootstrap modal
+     */
+
+    function showModal(title, content) {
+        $('#hModal' ).html(title);
+        $('#divModalContent' ).html(content);
+        $('#divModal' ).modal();
+    }
+
     /**
      *  Utility to make random IDs
      *  credit: http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
@@ -779,6 +790,7 @@
                 clickLeftPx = evt.offsetX,
                 clickLeftVal = (clickLeftPx / self.width) * (self.maxVal - self.minVal),
                 dx,
+                selRatio,
                 closestVal,
                 closestTo = 'value';
         
@@ -792,9 +804,12 @@
                     'value': Math.abs(self.value - clickLeftVal),
                     'high': Math.abs(self.high - clickLeftVal)
                 };
-                
-                console.log('low: ' + self.low + ' val: ' + self.value + ' high: ' + self.high);
-                console.log('dx', dx);
+
+                //  preserve relative midpoint when moving bounds
+                selRatio = ((self.value - self.low) / (self.high - self.low));
+
+                //console.log('low: ' + self.low + ' val: ' + self.value + ' high: ' + self.high);
+                //console.log('dx', dx);
                 
                 closestVal = self.maxVal;
                 
@@ -803,7 +818,10 @@
                 if (dx.high < closestVal) { closestTo = 'high'; }
                                 
                 self[closestTo] = clickLeftVal;
-                console.log('slider click closest to ' + closestTo);
+
+                if ('low' === closestTo || 'high' === closestTo) {
+                    self.value = self.low + ((self.high - self.low) * selRatio);
+                }
             }
     
             redraw();
@@ -882,19 +900,40 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-right">
             <li><a id="aDownload" href="#">Download</a></li>
+            <li><a id="aAbout" href="#">About</a></li>
             <li><a href="http://makehuman.org/">MakeHuman</a></li>
           </ul>
         </div>
       </div>
     </nav>
     <br/>
-    
+
+    <!-- Modal -->
+    <div id="divModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 id="hModal" class="modal-title">Modal Header</h4>
+                </div>
+                <div id="divModalContent" class="modal-body">
+                    <p>Some text in the modal.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
     <br/><br/>
     
     <div id="divMain" class="container">
     
       <canvas id="cnvComposite" width="2048px" height="2048px" style="width: 1132px; height: 1132px;"></canvas><br/>
-
+      <span style="float:right;"><a href="https://github.com/vestan/skinmaker/">GitHub project page</a></span>
       <table noborder>
         <tr>
           <td>
@@ -943,9 +982,7 @@
         </div>
       </div>
 
-      <footer class="footer">
-        <hr>
-        <h3>About</h3>
+      <div id="divAbout" style="display: none;">
         <p>This page is an experiment in making a web-based compositor for skin images for human figures.  It is
         intended to work with the Materials Editor plugin of the <a href="http://www.makehuman.org">MakeHuman</a>
         3D modelling software.  Its purpose is to help simplify basic customization of skins for human characters.</p>
@@ -953,27 +990,31 @@
         <p>To apply a skin texture from this page to a model in MakeHuman:</p>
 
         <ul>
-            <li>Download the skin image</li>
-            <li>Set a skin material on your model</li>
-            <li>Open the "Material Editor" task on the "Utilities" category</li>
-            <li>Set the shader to "litsphere"</li>
-            <li>Click the button under "Diffuse texture" and browser to your file.</li>
+          <li>Download the skin image</li>
+          <li>Set a skin material on your model</li>
+          <li>Open the "Material Editor" task on the "Utilities" category</li>
+          <li>Set the shader to "litsphere"</li>
+          <li>Click the button under "Diffuse texture" and browse to your file.</li>
         </ul>
 
         <p>At present this is an early test and content is very limited, please submit your own masks or skins if you
-        are happy to share them. All images used by this page belong to their respective owners, licences can be found
+        are happy to share them.  All images used by this page belong to their respective owners, licences can be found
         at the linked pages.  I expect this page will work in all modern browsers, Safari and IE may have problems.</p>
 
         <p>This companion software is not written or supported by the MakeHuman project, please
-        don't bug them about it.</p>
-      </footer>
+        don't bug them about it, instead, <a href="https://github.com/vestan/skinmaker/issues">submit a ticket on
+        GitHub</a>.</p>
+      </div>
 
+      <footer class="footer">
+
+      </footer>
     </div>
     <hr/>
     <br/><br/>
     <!-- Bootstrap core JavaScript
     ================================================== -->
-    <script src="/static/jquery.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" />
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
