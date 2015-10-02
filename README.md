@@ -8,17 +8,18 @@ All skin images are made by and belong to the MakeHuman project, all credit shou
 
 If you would like to contibute masks, please do :-)
 
-## Roadmap 
+## Roadmap / TODO
 
 * Tidy the UI
 * Add more masks
+* Add a WebGL View with Three.js
 * Add a feature to generate complimentary specular maps
-* Add a coloring tool to select quads on the default UV
+* Add a coloring tool to paint faces on the default UV from 3d view
 
 ## To research
 
+* Alternate way to paint very closely spaced faces, such as eyelids
 * Baking textures in Javascript
-* Displaying the default MakeHuman mesh with WebGL for live viewing
 * Using Javascript to produce a blend file with shaders and assets for makeup / tattoo layers
 
 ## Related Links
